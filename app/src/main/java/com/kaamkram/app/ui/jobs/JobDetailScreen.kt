@@ -1,0 +1,362 @@
+package com.kaamkram.app.ui.jobs
+
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.kaamkram.app.R
+import com.kaamkram.app.core.money.MoneyFormatter
+import com.kaamkram.app.domain.model.Estimate
+import com.kaamkram.app.domain.model.Job
+import com.kaamkram.app.domain.model.JobEvent
+import com.kaamkram.app.domain.model.JobStatus
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun JobDetailScreen(
+    jobId: String,
+    onNavigateBack: () -> Unit,
+    onNavigateToCreateEstimate: (String) -> Unit,
+    viewModel: JobDetailViewModel = hiltViewModel()
+) {
+    val context = LocalContext.current
+    val job by viewModel.job.collectAsState()
+    val customer by viewModel.customer.collectAsState()
+    val estimate by viewModel.estimate.collectAsState()
+    val currentEstimateVersion by viewModel.currentEstimateVersion.collectAsState()
+    val events by viewModel.events.collectAsState(initial = emptyList())
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = job?.jobNumber ?: stringResource(R.string.job_title),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        if (job == null || customer == null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Customer & Contact Card
+                item {
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = customer!!.name,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = customer!!.phone,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${customer!!.phone}"))
+                                        context.startActivity(intent)
+                                    }
+                                ) {
+                                    Icon(Icons.Default.Call, contentDescription = stringResource(R.string.action_call))
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Scheduled: ${job!!.scheduledDate ?: "Not specified"}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+
+                // Workflow Actions based on Job State Machine
+                item {
+                    WorkflowActionCard(
+                        job = job!!,
+                        estimate = estimate,
+                        onCreateEstimateClick = { onNavigateToCreateEstimate(job!!.id) },
+                        onStartWorkClick = { viewModel.updateJobStatus(JobStatus.IN_PROGRESS) },
+                        onCompleteWorkClick = { viewModel.updateJobStatus(JobStatus.COMPLETED) },
+                        onApproveEstimateClick = { viewModel.approveEstimate() }
+                    )
+                }
+
+                // Estimate / Quote Section
+                item {
+                    if (currentEstimateVersion != null) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer
+                            )
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Quote Rev ${currentEstimateVersion!!.versionNumber}",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                    SuggestionChip(
+                                        onClick = {},
+                                        label = { Text(estimate?.status?.name ?: "DRAFT") }
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = MoneyFormatter.formatPaise(currentEstimateVersion!!.grandTotalPaise),
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Button(
+                                        modifier = Modifier.weight(1f),
+                                        onClick = {
+                                            viewModel.generateAndShareQuotePdf(context) { pdfFile ->
+                                                val uri = FileProvider.getUriForFile(
+                                                    context,
+                                                    "${context.packageName}.fileprovider",
+                                                    pdfFile
+                                                )
+                                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                                    type = "application/pdf"
+                                                    putExtra(Intent.EXTRA_STREAM, uri)
+                                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                                }
+                                                context.startActivity(Intent.createChooser(shareIntent, "Share Quote PDF"))
+                                            }
+                                        }
+                                    ) {
+                                        Icon(Icons.Default.Share, contentDescription = null)
+                                        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                                        Text(stringResource(R.string.estimate_share_pdf))
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        OutlinedButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = { onNavigateToCreateEstimate(job!!.id) }
+                        ) {
+                            Icon(Icons.Default.Description, contentDescription = null)
+                            Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                            Text(stringResource(R.string.estimate_new))
+                        }
+                    }
+                }
+
+                // Timeline Section
+                item {
+                    Text(
+                        text = stringResource(R.string.job_timeline),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                items(events, key = { it.id }) { event ->
+                    TimelineItemRow(event = event)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun WorkflowActionCard(
+    job: Job,
+    estimate: Estimate?,
+    onCreateEstimateClick: () -> Unit,
+    onStartWorkClick: () -> Unit,
+    onCompleteWorkClick: () -> Unit,
+    onApproveEstimateClick: () -> Unit
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Next Steps • ${job.status.name}",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            when (job.status) {
+                JobStatus.REQUESTED -> {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = onCreateEstimateClick
+                    ) {
+                        Text(stringResource(R.string.estimate_new))
+                    }
+                }
+                JobStatus.QUOTED -> {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = onApproveEstimateClick
+                    ) {
+                        Icon(Icons.Default.Check, contentDescription = null)
+                        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                        Text(stringResource(R.string.estimate_approve_action))
+                    }
+                }
+                JobStatus.APPROVED, JobStatus.SCHEDULED -> {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = onStartWorkClick
+                    ) {
+                        Icon(Icons.Default.PlayArrow, contentDescription = null)
+                        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                        Text("Start Work on Site")
+                    }
+                }
+                JobStatus.IN_PROGRESS -> {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = onCompleteWorkClick
+                    ) {
+                        Icon(Icons.Default.Check, contentDescription = null)
+                        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                        Text("Mark Work Completed")
+                    }
+                }
+                JobStatus.COMPLETED -> {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {}
+                    ) {
+                        Icon(Icons.Default.Receipt, contentDescription = null)
+                        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                        Text(stringResource(R.string.invoice_new))
+                    }
+                }
+                else -> {
+                    Text(
+                        text = "Job is in terminal state: ${job.status.name}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TimelineItemRow(event: JobEvent) {
+    val dateStr = SimpleDateFormat("dd MMM, hh:mm a", Locale.getDefault()).format(Date(event.timestampEpochMs))
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = event.eventType.name,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = dateStr,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = event.summary,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
