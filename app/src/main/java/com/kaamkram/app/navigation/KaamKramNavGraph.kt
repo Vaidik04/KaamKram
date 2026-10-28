@@ -21,10 +21,12 @@ import androidx.navigation.navArgument
 import com.kaamkram.app.ui.customers.CreateCustomerScreen
 import com.kaamkram.app.ui.customers.CustomersScreen
 import com.kaamkram.app.ui.estimates.CreateEstimateScreen
+import com.kaamkram.app.ui.invoices.CreateInvoiceScreen
 import com.kaamkram.app.ui.jobs.CreateJobScreen
 import com.kaamkram.app.ui.jobs.JobDetailScreen
 import com.kaamkram.app.ui.jobs.JobsScreen
 import com.kaamkram.app.ui.money.MoneyScreen
+import com.kaamkram.app.ui.profile.BusinessProfileScreen
 import com.kaamkram.app.ui.settings.SettingsScreen
 import com.kaamkram.app.ui.today.TodayScreen
 
@@ -95,7 +97,7 @@ fun KaamKramAppContent(
             }
             composable(Screen.More.route) {
                 SettingsScreen(
-                    onNavigateToProfile = {}
+                    onNavigateToProfile = { navController.navigate(Screen.BusinessProfile.route) }
                 )
             }
 
@@ -120,6 +122,9 @@ fun KaamKramAppContent(
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateToCreateEstimate = { id ->
                         navController.navigate(Screen.EstimateDetail.createRoute(id))
+                    },
+                    onNavigateToCreateInvoice = { id ->
+                        navController.navigate(Screen.InvoiceDetail.createRoute(id))
                     }
                 )
             }
@@ -140,6 +145,22 @@ fun KaamKramAppContent(
                     jobId = jobId,
                     onNavigateBack = { navController.popBackStack() },
                     onEstimateSaved = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Screen.InvoiceDetail.route,
+                arguments = listOf(navArgument("jobId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val jobId = backStackEntry.arguments?.getString("jobId") ?: ""
+                CreateInvoiceScreen(
+                    jobId = jobId,
+                    onNavigateBack = { navController.popBackStack() },
+                    onInvoiceCreated = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.BusinessProfile.route) {
+                BusinessProfileScreen(
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
         }

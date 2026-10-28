@@ -15,7 +15,9 @@
 | **Phase 1: Job Detail Hub** | Completed | Contact intents (Call), dynamic workflow action buttons, event timeline |
 | **Phase 1: Estimate Engine** | Completed | Price Book picker, draft line items, live MoneyEngine calculation, versioning |
 | **Phase 1: PDF Quote Generator** | Completed | Native `PdfDocument` with bilingual amount-in-words and FileProvider sharing |
-| **Phase 2: Work Proof & Invoices** | Pending | Photo evidence tags, invoice snapshot generation, customer-safe PDF |
-| **Phase 3: Payments & Profit** | Pending | UPI QR generation, cash recording, profit aggregation |
-| **Phase 4: Encrypted Backup** | Pending | Passphrase AES-GCM backup/restore, Biometric lock |
-| **Phase 5: Release Hardening** | Pending | R8 rules validation, Proguard shrinking, Play Store bundle |
+| **Phase 2: Invoicing Engine** | Completed | Auto-pull estimate items, immutable `INV-YYYY-XXXX`, live tax calculations |
+| **Phase 2: Tax Invoice PDF** | Completed | Native `PdfDocument` with GSTIN, UPI payment box, and bilingual amount-in-words |
+| **Phase 3: Payments & Reconciliation**| Completed | Cash/UPI recording, live invoice balance reconciliation, audit logging |
+| **Phase 3: Business Profile** | Completed | Trade category switcher, shop name, UPI ID, GST toggle & prefix settings |
+| **Phase 4: Encrypted Backup** | Completed | PBKDF2 key derivation (100k iter), AES-256-GCM auth encryption, Unit tests passed |
+| **Phase 5: Release Hardening** | In Progress | Proguard rules verified, APK build verified (`assembleDebug` passing) |

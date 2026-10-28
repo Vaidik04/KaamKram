@@ -12,44 +12,61 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kaamkram.app.R
 import com.kaamkram.app.core.money.MoneyFormatter
 import com.kaamkram.app.domain.model.Estimate
+import com.kaamkram.app.domain.model.Invoice
 import com.kaamkram.app.domain.model.Job
 import com.kaamkram.app.domain.model.JobEvent
 import com.kaamkram.app.domain.model.JobStatus
+import com.kaamkram.app.domain.model.Payment
+import com.kaamkram.app.domain.model.PaymentMode
+import com.kaamkram.app.ui.theme.OverdueRed
+import com.kaamkram.app.ui.theme.SuccessGreen
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -60,6 +77,7 @@ fun JobDetailScreen(
     jobId: String,
     onNavigateBack: () -> Unit,
     onNavigateToCreateEstimate: (String) -> Unit,
+    onNavigateToCreateInvoice: (String) -> Unit,
     viewModel: JobDetailViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -67,7 +85,11 @@ fun JobDetailScreen(
     val customer by viewModel.customer.collectAsState()
     val estimate by viewModel.estimate.collectAsState()
     val currentEstimateVersion by viewModel.currentEstimateVersion.collectAsState()
+    val invoice by viewModel.invoice.collectAsState()
     val events by viewModel.events.collectAsState(initial = emptyList())
+    val payments by viewModel.payments.collectAsState(initial = emptyList())
+
+    var showPaymentDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -81,7 +103,7 @@ fun JobDetailScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 }
             )
@@ -154,8 +176,109 @@ fun JobDetailScreen(
                         onCreateEstimateClick = { onNavigateToCreateEstimate(job!!.id) },
                         onStartWorkClick = { viewModel.updateJobStatus(JobStatus.IN_PROGRESS) },
                         onCompleteWorkClick = { viewModel.updateJobStatus(JobStatus.COMPLETED) },
-                        onApproveEstimateClick = { viewModel.approveEstimate() }
+                        onApproveEstimateClick = { viewModel.approveEstimate() },
+                        onCreateInvoiceClick = { onNavigateToCreateInvoice(job!!.id) }
                     )
+                }
+
+                // Invoice Section
+                if (invoice != null) {
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = invoice!!.invoiceNumber,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    SuggestionChip(
+                                        onClick = {},
+                                        label = { Text(invoice!!.status.name) }
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = stringResource(R.string.invoice_total),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            text = MoneyFormatter.formatPaise(invoice!!.grandTotalPaise),
+                                            style = MaterialTheme.typography.titleLarge,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                    Column(horizontalAlignment = Alignment.End) {
+                                        Text(
+                                            text = stringResource(R.string.invoice_balance),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            text = MoneyFormatter.formatPaise(invoice!!.balanceDuePaise),
+                                            style = MaterialTheme.typography.titleLarge,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (invoice!!.balanceDuePaise > 0) OverdueRed else SuccessGreen
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Button(
+                                        modifier = Modifier.weight(1f),
+                                        onClick = {
+                                            viewModel.generateAndShareInvoicePdf(context) { pdfFile ->
+                                                val uri = FileProvider.getUriForFile(
+                                                    context,
+                                                    "${context.packageName}.fileprovider",
+                                                    pdfFile
+                                                )
+                                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                                    type = "application/pdf"
+                                                    putExtra(Intent.EXTRA_STREAM, uri)
+                                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                                }
+                                                context.startActivity(Intent.createChooser(shareIntent, "Share Invoice PDF"))
+                                            }
+                                        }
+                                    ) {
+                                        Icon(Icons.Default.Share, contentDescription = null)
+                                        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                                        Text(stringResource(R.string.invoice_share_pdf))
+                                    }
+
+                                    if (invoice!!.balanceDuePaise > 0) {
+                                        Button(
+                                            modifier = Modifier.weight(1f),
+                                            onClick = { showPaymentDialog = true }
+                                        ) {
+                                            Icon(Icons.Default.AccountBalanceWallet, contentDescription = null)
+                                            Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                                            Text(stringResource(R.string.payment_record_action))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 // Estimate / Quote Section
@@ -221,7 +344,7 @@ fun JobDetailScreen(
                                 }
                             }
                         }
-                    } else {
+                    } else if (invoice == null) {
                         OutlinedButton(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = { onNavigateToCreateEstimate(job!!.id) }
@@ -248,6 +371,98 @@ fun JobDetailScreen(
             }
         }
     }
+
+    if (showPaymentDialog && invoice != null) {
+        RecordPaymentDialog(
+            defaultAmountRupees = (invoice!!.balanceDuePaise / 100).toString(),
+            onDismiss = { showPaymentDialog = false },
+            onConfirm = { amountRupees, mode, ref ->
+                viewModel.recordPayment(amountRupees, mode, ref)
+                showPaymentDialog = false
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RecordPaymentDialog(
+    defaultAmountRupees: String,
+    onDismiss: () -> Unit,
+    onConfirm: (amountRupees: String, mode: PaymentMode, reference: String?) -> Unit
+) {
+    var amount by remember { mutableStateOf(defaultAmountRupees) }
+    var selectedMode by remember { mutableStateOf(PaymentMode.UPI) }
+    var referenceNumber by remember { mutableStateOf("") }
+    var modeDropdownExpanded by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.payment_record_action)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = amount,
+                    onValueChange = { amount = it },
+                    label = { Text(stringResource(R.string.payment_amount)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                ExposedDropdownMenuBox(
+                    expanded = modeDropdownExpanded,
+                    onExpandedChange = { modeDropdownExpanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = selectedMode.name,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text(stringResource(R.string.payment_mode)) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = modeDropdownExpanded) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = modeDropdownExpanded,
+                        onDismissRequest = { modeDropdownExpanded = false }
+                    ) {
+                        PaymentMode.values().forEach { mode ->
+                            DropdownMenuItem(
+                                text = { Text(mode.name) },
+                                onClick = {
+                                    selectedMode = mode
+                                    modeDropdownExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                OutlinedTextField(
+                    value = referenceNumber,
+                    onValueChange = { referenceNumber = it },
+                    label = { Text(stringResource(R.string.payment_upi_ref)) },
+                    placeholder = { Text("e.g. UTR / Transaction ID") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onConfirm(amount, selectedMode, referenceNumber.ifEmpty { null }) }
+            ) {
+                Text(stringResource(R.string.action_save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.action_cancel))
+            }
+        }
+    )
 }
 
 @Composable
@@ -257,7 +472,8 @@ fun WorkflowActionCard(
     onCreateEstimateClick: () -> Unit,
     onStartWorkClick: () -> Unit,
     onCompleteWorkClick: () -> Unit,
-    onApproveEstimateClick: () -> Unit
+    onApproveEstimateClick: () -> Unit,
+    onCreateInvoiceClick: () -> Unit
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -311,7 +527,7 @@ fun WorkflowActionCard(
                 JobStatus.COMPLETED -> {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = {}
+                        onClick = onCreateInvoiceClick
                     ) {
                         Icon(Icons.Default.Receipt, contentDescription = null)
                         Spacer(modifier = Modifier.padding(horizontal = 4.dp))
@@ -320,7 +536,7 @@ fun WorkflowActionCard(
                 }
                 else -> {
                     Text(
-                        text = "Job is in terminal state: ${job.status.name}",
+                        text = "Job is in state: ${job.status.name}",
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
