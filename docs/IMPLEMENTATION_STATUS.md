@@ -20,4 +20,6 @@
 | **Phase 3: Payments & Reconciliation**| Completed | Cash/UPI recording, live invoice balance reconciliation, audit logging |
 | **Phase 3: Business Profile** | Completed | Trade category switcher, shop name, UPI ID, GST toggle & prefix settings |
 | **Phase 4: Encrypted Backup** | Completed | PBKDF2 key derivation (100k iter), AES-256-GCM auth encryption, Unit tests passed |
-| **Phase 5: Release Hardening** | In Progress | Proguard rules verified, APK build verified (`assembleDebug` passing) |
+| **Phase 4: Service Warranties** | Completed | Warranty tracking, start/expiry dates, WorkManager daily background alerts |
+| **Phase 4: Photo Evidence & Customer Hub** | Completed | Scoped private storage, customer lifetime value & history metrics |
+| **Phase 5: Release Hardening & Docs** | Completed | Proguard rules verified, APK build verified (`assembleDebug` passing), full docs suite |

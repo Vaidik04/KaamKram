@@ -19,6 +19,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.kaamkram.app.ui.customers.CreateCustomerScreen
+import com.kaamkram.app.ui.customers.CustomerDetailScreen
 import com.kaamkram.app.ui.customers.CustomersScreen
 import com.kaamkram.app.ui.estimates.CreateEstimateScreen
 import com.kaamkram.app.ui.invoices.CreateInvoiceScreen
@@ -89,7 +90,9 @@ fun KaamKramAppContent(
             composable(Screen.Customers.route) {
                 CustomersScreen(
                     onNavigateToNewCustomer = { navController.navigate(Screen.NewCustomer.route) },
-                    onNavigateToCustomerDetail = { customerId -> }
+                    onNavigateToCustomerDetail = { customerId ->
+                        navController.navigate(Screen.CustomerDetail.createRoute(customerId))
+                    }
                 )
             }
             composable(Screen.Money.route) {
@@ -133,6 +136,19 @@ fun KaamKramAppContent(
                     onNavigateBack = { navController.popBackStack() },
                     onCustomerCreated = { customerId ->
                         navController.popBackStack()
+                    }
+                )
+            }
+            composable(
+                route = Screen.CustomerDetail.route,
+                arguments = listOf(navArgument("customerId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val customerId = backStackEntry.arguments?.getString("customerId") ?: ""
+                CustomerDetailScreen(
+                    customerId = customerId,
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateToJobDetail = { jobId ->
+                        navController.navigate(Screen.JobDetail.createRoute(jobId))
                     }
                 )
             }

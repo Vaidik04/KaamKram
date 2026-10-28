@@ -38,6 +38,9 @@ interface WarrantyDao {
     @Query("SELECT * FROM warranties WHERE jobId = :jobId")
     fun getWarrantiesForJob(jobId: String): Flow<List<WarrantyEntity>>
 
+    @Query("SELECT * FROM warranties ORDER BY expiryDate ASC")
+    fun getAllWarranties(): Flow<List<WarrantyEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWarranty(warranty: WarrantyEntity)
 }

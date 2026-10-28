@@ -1,6 +1,7 @@
 package com.kaamkram.app.ui.jobs
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +14,9 @@ import com.kaamkram.app.data.repository.EstimateRepository
 import com.kaamkram.app.data.repository.InvoiceRepository
 import com.kaamkram.app.data.repository.JobRepository
 import com.kaamkram.app.data.repository.PaymentRepository
+import com.kaamkram.app.data.repository.PhotoEvidenceRepository
+import com.kaamkram.app.data.local.entity.WarrantyEntity
+import com.kaamkram.app.data.repository.WarrantyRepository
 import com.kaamkram.app.domain.model.BusinessProfile
 import com.kaamkram.app.domain.model.Customer
 import com.kaamkram.app.domain.model.Estimate
@@ -23,6 +27,9 @@ import com.kaamkram.app.domain.model.JobEvent
 import com.kaamkram.app.domain.model.JobStatus
 import com.kaamkram.app.domain.model.Payment
 import com.kaamkram.app.domain.model.PaymentMode
+import com.kaamkram.app.domain.model.PhotoCategory
+import com.kaamkram.app.domain.model.PhotoEvidence
+import com.kaamkram.app.domain.model.PhotoSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,6 +47,8 @@ class JobDetailViewModel @Inject constructor(
     private val estimateRepository: EstimateRepository,
     private val invoiceRepository: InvoiceRepository,
     private val paymentRepository: PaymentRepository,
+    private val photoEvidenceRepository: PhotoEvidenceRepository,
+    private val warrantyRepository: WarrantyRepository,
     private val businessProfileDao: BusinessProfileDao
 ) : ViewModel() {
 
@@ -62,6 +71,8 @@ class JobDetailViewModel @Inject constructor(
 
     val events: Flow<List<JobEvent>> = jobRepository.getEventsForJob(jobId)
     val payments: Flow<List<Payment>> = paymentRepository.getPaymentsForJob(jobId)
+    val photos: Flow<List<PhotoEvidence>> = photoEvidenceRepository.getPhotosForJob(jobId)
+    val warranties: Flow<List<WarrantyEntity>> = warrantyRepository.getWarrantiesForJob(jobId)
 
     init {
         loadJobDetails()
@@ -109,6 +120,30 @@ class JobDetailViewModel @Inject constructor(
                 amountPaise = paise,
                 paymentMode = mode,
                 referenceNumber = reference
+            )
+            loadJobDetails()
+        }
+    }
+
+    fun addPhotoEvidence(uri: Uri, category: PhotoCategory, source: PhotoSource) {
+        viewModelScope.launch {
+            photoEvidenceRepository.savePhotoEvidence(
+                jobId = jobId,
+                sourceUri = uri,
+                category = category,
+                source = source
+            )
+            loadJobDetails()
+        }
+    }
+
+    fun issueWarranty(serviceOrItemName: String, durationDays: Int, terms: String? = null) {
+        viewModelScope.launch {
+            warrantyRepository.addWarranty(
+                jobId = jobId,
+                serviceOrItemName = serviceOrItemName,
+                durationDays = durationDays,
+                terms = terms
             )
             loadJobDetails()
         }

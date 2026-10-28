@@ -2,6 +2,8 @@ package com.kaamkram.app.ui.jobs
 
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,12 +13,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.PlayArrow
@@ -34,6 +39,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -56,8 +62,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.material.icons.filled.VerifiedUser
 import com.kaamkram.app.R
 import com.kaamkram.app.core.money.MoneyFormatter
+import com.kaamkram.app.data.local.entity.WarrantyEntity
 import com.kaamkram.app.domain.model.Estimate
 import com.kaamkram.app.domain.model.Invoice
 import com.kaamkram.app.domain.model.Job
@@ -65,8 +73,12 @@ import com.kaamkram.app.domain.model.JobEvent
 import com.kaamkram.app.domain.model.JobStatus
 import com.kaamkram.app.domain.model.Payment
 import com.kaamkram.app.domain.model.PaymentMode
+import com.kaamkram.app.domain.model.PhotoCategory
+import com.kaamkram.app.domain.model.PhotoEvidence
+import com.kaamkram.app.domain.model.PhotoSource
 import com.kaamkram.app.ui.theme.OverdueRed
 import com.kaamkram.app.ui.theme.SuccessGreen
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -87,9 +99,19 @@ fun JobDetailScreen(
     val currentEstimateVersion by viewModel.currentEstimateVersion.collectAsState()
     val invoice by viewModel.invoice.collectAsState()
     val events by viewModel.events.collectAsState(initial = emptyList())
-    val payments by viewModel.payments.collectAsState(initial = emptyList())
+    val photos by viewModel.photos.collectAsState(initial = emptyList())
+    val warranties by viewModel.warranties.collectAsState(initial = emptyList())
 
     var showPaymentDialog by remember { mutableStateOf(false) }
+    var showWarrantyDialog by remember { mutableStateOf(false) }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            viewModel.addPhotoEvidence(uri, PhotoCategory.AFTER, PhotoSource.IMPORTED_FROM_GALLERY)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -179,6 +201,41 @@ fun JobDetailScreen(
                         onApproveEstimateClick = { viewModel.approveEstimate() },
                         onCreateInvoiceClick = { onNavigateToCreateInvoice(job!!.id) }
                     )
+                }
+
+                // Work Evidence Photos Section
+                item {
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.evidence_title),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                OutlinedButton(onClick = { imagePickerLauncher.launch("image/*") }) {
+                                    Icon(Icons.Default.AddPhotoAlternate, contentDescription = null)
+                                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                                    Text("Add Photo")
+                                }
+                            }
+
+                            if (photos.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                LazyRow(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    items(photos, key = { it.id }) { photo ->
+                                        PhotoEvidenceChip(photo = photo)
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 // Invoice Section
@@ -356,6 +413,72 @@ fun JobDetailScreen(
                     }
                 }
 
+                // Warranties Section
+                item {
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Service & Parts Warranties",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                OutlinedButton(onClick = { showWarrantyDialog = true }) {
+                                    Icon(Icons.Default.VerifiedUser, contentDescription = null)
+                                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                                    Text("Issue")
+                                }
+                            }
+
+                            if (warranties.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    warranties.forEach { w ->
+                                        Card(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                                        ) {
+                                            Column(modifier = Modifier.padding(12.dp)) {
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.SpaceBetween
+                                                ) {
+                                                    Text(
+                                                        text = w.serviceOrItemName,
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                    Text(
+                                                        text = "${w.durationDays} Days",
+                                                        style = MaterialTheme.typography.labelMedium,
+                                                        color = MaterialTheme.colorScheme.primary
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.height(4.dp))
+                                                Text(
+                                                    text = "Valid: ${w.startDate} to ${w.expiryDate}",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                                if (!w.terms.isNullOrBlank()) {
+                                                    Text(
+                                                        text = "Terms: ${w.terms}",
+                                                        style = MaterialTheme.typography.bodySmall
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Timeline Section
                 item {
                     Text(
@@ -381,6 +504,113 @@ fun JobDetailScreen(
                 showPaymentDialog = false
             }
         )
+    }
+
+    if (showWarrantyDialog && job != null) {
+        IssueWarrantyDialog(
+            defaultItemName = job!!.title,
+            onDismiss = { showWarrantyDialog = false },
+            onConfirm = { serviceName, durationDays, terms ->
+                viewModel.issueWarranty(serviceName, durationDays, terms)
+                showWarrantyDialog = false
+            }
+        )
+    }
+}
+
+@Composable
+fun IssueWarrantyDialog(
+    defaultItemName: String,
+    onDismiss: () -> Unit,
+    onConfirm: (serviceName: String, durationDays: Int, terms: String?) -> Unit
+) {
+    var serviceName by remember { mutableStateOf(defaultItemName) }
+    var durationDaysStr by remember { mutableStateOf("90") }
+    var terms by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Issue Warranty Certificate") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = serviceName,
+                    onValueChange = { serviceName = it },
+                    label = { Text("Service or Part Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                OutlinedTextField(
+                    value = durationDaysStr,
+                    onValueChange = { durationDaysStr = it.filter { ch -> ch.isDigit() } },
+                    label = { Text("Warranty Duration (Days)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    listOf(30, 90, 180, 365).forEach { days ->
+                        SuggestionChip(
+                            onClick = { durationDaysStr = days.toString() },
+                            label = { Text("${days}d") }
+                        )
+                    }
+                }
+
+                OutlinedTextField(
+                    value = terms,
+                    onValueChange = { terms = it },
+                    label = { Text("Terms & Conditions (Optional)") },
+                    placeholder = { Text("e.g. Physical damage or misuse excluded") },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 3
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val days = durationDaysStr.toIntOrNull() ?: 30
+                    if (serviceName.isNotBlank() && days > 0) {
+                        onConfirm(serviceName.trim(), days, terms.trim().ifEmpty { null })
+                    }
+                }
+            ) {
+                Text("Issue Warranty")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.action_cancel))
+            }
+        }
+    )
+}
+
+@Composable
+fun PhotoEvidenceChip(photo: PhotoEvidence) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(
+                text = photo.category.name,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = if (photo.source == PhotoSource.CAPTURED_IN_APP) "Captured" else "Imported",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -422,7 +652,7 @@ fun RecordPaymentDialog(
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = modeDropdownExpanded) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                     )
                     ExposedDropdownMenu(
                         expanded = modeDropdownExpanded,
