@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">कामक्रम</string>
+    <string name="app_tagline">कारीगरों और तकनीशियनों के लिए काम और भुगतान ऐप</string>
+
+    <!-- Navigation -->
+    <string name="nav_today">आज</string>
+    <string name="nav_jobs">काम (Jobs)</string>
+    <string name="nav_customers">ग्राहक</string>
+    <string name="nav_money">हिसाब-किताब</string>
+    <string name="nav_more">अन्य</string>
+
+    <!-- Common Actions -->
+    <string name="action_save">सहेजें</string>
+    <string name="action_cancel">रद्द करें</string>
+    <string name="action_delete">हटाएं</string>
+    <string name="action_edit">बदलें</string>
+    <string name="action_share">शेयर करें</string>
+    <string name="action_call">कॉल करें</string>
+    <string name="action_whatsapp">व्हाट्सएप</string>
+    <string name="action_copy">कॉपी करें</string>
+    <string name="action_confirm">पुष्टि करें</string>
+    <string name="action_done">पूर्ण</string>
+    <string name="action_back">पीछे</string>
+    <string name="action_next">आगे</string>
+    <string name="action_skip">छोड़ें</string>
+    <string name="action_search">खोजें</string>
+    <string name="action_filter">फ़िल्टर</string>
+    <string name="action_add">जोड़ें</string>
+    <string name="action_retry">पुनः प्रयास करें</string>
+    <string name="action_view_all">सभी देखें</string>
+
+    <!-- Job Statuses -->
+    <string name="status_requested">नया अनुरोध</string>
+    <string name="status_quoted">कोटेशन दिया</string>
+    <string name="status_approved">स्वीकृत</string>
+    <string name="status_scheduled">तय किया गया</string>
+    <string name="status_in_progress">काम चालू है</string>
+    <string name="status_completed">काम पूरा हुआ</string>
+    <string name="status_invoiced">बिल भेजा गया</string>
+    <string name="status_paid">भुगतान प्राप्त</string>
+    <string name="status_cancelled">रद्द किया गया</string>
+
+    <!-- Today Screen -->
+    <string name="today_title">आज का काम</string>
+    <string name="today_empty_title">आज कोई काम निर्धारित नहीं है</string>
+    <string name="today_empty_subtitle">नया काम जोड़ें या अगला दौरा तय करें।</string>
+    <string name="today_metric_due_today">आज का काम</string>
+    <string name="today_metric_in_progress">चालू काम</string>
+    <string name="today_metric_pending_payment">बकाया वसूली</string>
+    <string name="today_quick_new_job">नया काम</string>
+    <string name="today_quick_new_quote">नया कोटेशन</string>
+
+    <!-- Job Detail & Workflow -->
+    <string name="job_title">काम विवरण</string>
+    <string name="job_new">नया काम</string>
+    <string name="job_number">काम क्र. %s</string>
+    <string name="job_site_address">साइट का पता</string>
+    <string name="job_scheduled_date">तारीख</string>
+    <string name="job_status">स्थिति</string>
+    <string name="job_timeline">टाइमलाइन</string>
+    <string name="job_estimate">कोटेशन (अनुमान)</string>
+    <string name="job_invoice">बिल / चालान</string>
+    <string name="job_evidence">काम के फोटो</string>
+    <string name="job_change_orders">अतिरिक्त काम</string>
+    <string name="job_warranty">वारंटी</string>
+    <string name="job_notes">नोट्स</string>
+    <string name="job_no_jobs_found">कोई काम नहीं मिला</string>
+
+    <!-- Customer -->
+    <string name="customer_title">ग्राहक सूची</string>
+    <string name="customer_new">नया ग्राहक जोड़ें</string>
+    <string name="customer_name">ग्राहक का नाम</string>
+    <string name="customer_phone">मोबाइल नंबर</string>
+    <string name="customer_alternate_phone">वैकल्पिक नंबर (वैकल्पिक)</string>
+    <string name="customer_notes">ग्राहक के बारे में नोट</string>
+    <string name="customer_search_placeholder">नाम या मोबाइल नंबर से खोजें…</string>
+    <string name="customer_no_history">इस ग्राहक के लिए पुराना कोई काम नहीं है</string>
+    <string name="customer_total_spent">कुल काम</string>
+    <string name="customer_balance_due">बकाया राशि</string>
+
+    <!-- Estimate / Quote -->
+    <string name="estimate_title">कोटेशन</string>
+    <string name="estimate_new">कोटेशन बनाएं</string>
+    <string name="estimate_version">संस्करण %d</string>
+    <string name="estimate_status_draft">ड्राफ्ट</string>
+    <string name="estimate_status_sent">भेजा गया</string>
+    <string name="estimate_status_approved">ग्राहक द्वारा स्वीकृत</string>
+    <string name="estimate_status_rejected">अस्वीकृत</string>
+    <string name="estimate_line_items">सामग्री व मजदूरी सूची</string>
+    <string name="estimate_add_item">आइटम जोड़ें</string>
+    <string name="estimate_subtotal">कुल योग</string>
+    <string name="estimate_discount">छूट (डिस्काउंट)</string>
+    <string name="estimate_tax">जीएसटी / कर</string>
+    <string name="estimate_grand_total">अंतिम कोटेशन राशि</string>
+    <string name="estimate_approve_action">स्वीकृत मार्क करें</string>
+    <string name="estimate_reject_action">अस्वीकृत मार्क करें</string>
+    <string name="estimate_share_pdf">कोटेशन PDF शेयर करें</string>
+
+    <!-- Invoice -->
+    <string name="invoice_title">बिल / चालान</string>
+    <string name="invoice_new">बिल बनाएं</string>
+    <string name="invoice_number">बिल नं. %s</string>
+    <string name="invoice_date">बिल तारीख</string>
+    <string name="invoice_due_date">भुगतान की अंतिम तारीख</string>
+    <string name="invoice_total">कुल बिल राशि</string>
+    <string name="invoice_paid">प्राप्त राशि</string>
+    <string name="invoice_balance">बकाया राशि</string>
+    <string name="invoice_share_pdf">बिल PDF शेयर करें</string>
+
+    <!-- Payment -->
+    <string name="payment_title">भुगतान</string>
+    <string name="payment_record_action">भुगतान दर्ज करें</string>
+    <string name="payment_amount">मिली हुई राशि (₹)</string>
+    <string name="payment_mode">माध्यम</string>
+    <string name="payment_mode_cash">नकद (Cash)</string>
+    <string name="payment_mode_upi">यूपीआई (UPI)</string>
+    <string name="payment_mode_bank">बैंक ट्रांसफर</string>
+    <string name="payment_mode_cheque">चेक</string>
+    <string name="payment_mode_other">अन्य</string>
+    <string name="payment_type_advance">एडवांस</string>
+    <string name="payment_type_partial">आंशिक भुगतान</string>
+    <string name="payment_type_final">अंतिम पूरा भुगतान</string>
+    <string name="payment_upi_ref">UPI रेफरेंस / UTR</string>
+    <string name="payment_date">भुगतान तारीख</string>
+    <string name="payment_show_upi_qr">UPI क्यूआर कोड दिखाएं</string>
+
+    <!-- Money / Profit Screen -->
+    <string name="money_screen_title">कमाई और मुनाफा</string>
+    <string name="money_total_billed">कुल बिल बनाया</string>
+    <string name="money_total_collected">कुल नकद/ऑनलाइन मिला</string>
+    <string name="money_total_pending">बाकी लेना बाकी</string>
+    <string name="money_est_profit">अनुमानित मुनाफा</string>
+    <string name="money_actual_profit">शुद्ध कमाई (मुनाफा)</string>
+    <string name="money_material_cost">सामान/पार्ट्स का खर्च</string>
+    <string name="money_profit_explanation">शुद्ध मुनाफा = कुल प्राप्त राशि में से सामान व अन्य खर्चे घटाकर।</string>
+
+    <!-- Work Evidence / Photos -->
+    <string name="evidence_title">काम के फोटो</string>
+    <string name="evidence_category_before">काम शुरू करने से पहले</string>
+    <string name="evidence_category_during">काम के दौरान</string>
+    <string name="evidence_category_after">काम पूरा होने के बाद</string>
+    <string name="evidence_take_photo">फोटो खींचें</string>
+    <string name="evidence_from_gallery">गैलरी से चुनें</string>
+    <string name="evidence_badge_captured">ऐप में खींची गई</string>
+    <string name="evidence_badge_imported">गैलरी से ली गई</string>
+
+    <!-- Settings / Profile -->
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="profile_title">व्यवसाय की जानकारी</string>
+    <string name="profile_business_name">दुकान / काम का नाम</string>
+    <string name="profile_owner_name">आपका नाम</string>
+    <string name="profile_phone">संपर्क मोबाइल नंबर</string>
+    <string name="profile_upi_id">UPI आईडी (QR कोड और बिल के लिए)</string>
+    <string name="profile_address">दुकान / काम का पता</string>
+    <string name="profile_trade_category">मुख्य काम (Trade)</string>
+    <string name="profile_gstin">जीएसटीआईएन (GSTIN - यदि हो)</string>
+
+    <!-- Trade Categories -->
+    <string name="trade_electrician">इलेक्ट्रीशियन (बिजली कारीगर)</string>
+    <string name="trade_ac_hvac">एसी और फ्रिज मैकेनिक</string>
+    <string name="trade_plumber">प्लंबर (नल/पाइप कारीगर)</string>
+    <string name="trade_ro_water">आरओ व वॉटर प्यूरीफायर</string>
+    <string name="trade_cctv_security">सीसीटीवी व सुरक्षा</string>
+    <string name="trade_other">सामान्य कारीगर</string>
+
+    <!-- Backup & Security -->
+    <string name="backup_title">सुरक्षित बैकअप</string>
+    <string name="backup_create_action">अभी बैकअप बनाएं</string>
+    <string name="backup_restore_action">बैकअप फाइल से डेटा वापस लाएं</string>
+    <string name="backup_passphrase">बैकअप पासवर्ड (सुरक्षित रखें!)</string>
+    <string name="security_biometric_lock">बायोमेट्रिक / फिंगरप्रिंट लॉक</string>
+
+    <!-- Validation & Errors -->
+    <string name="error_required">यह जानकारी जरूरी है</string>
+    <string name="error_invalid_phone">कृपया सही 10-अंकों का मोबाइल नंबर दर्ज करें</string>
+    <string name="error_invalid_amount">कृपया सही राशि दर्ज करें</string>
+    <string name="error_invalid_upi">कृपया सही UPI आईडी दर्ज करें (उदा. name@upi)</string>
+    <string name="error_generic">कुछ गलत हुआ। कृपया पुनः प्रयास करें।</string>
+</resources>

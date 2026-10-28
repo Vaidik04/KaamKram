@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">KaamKram</string>
+    <string name="app_tagline">Job-to-Payment OS for Tradespeople</string>
+
+    <!-- Navigation -->
+    <string name="nav_today">Today</string>
+    <string name="nav_jobs">Jobs</string>
+    <string name="nav_customers">Customers</string>
+    <string name="nav_money">Money</string>
+    <string name="nav_more">More</string>
+
+    <!-- Common Actions -->
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_share">Share</string>
+    <string name="action_call">Call</string>
+    <string name="action_whatsapp">WhatsApp</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_done">Done</string>
+    <string name="action_back">Back</string>
+    <string name="action_next">Next</string>
+    <string name="action_skip">Skip</string>
+    <string name="action_search">Search</string>
+    <string name="action_filter">Filter</string>
+    <string name="action_add">Add</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_view_all">View All</string>
+
+    <!-- Job Statuses -->
+    <string name="status_requested">Requested</string>
+    <string name="status_quoted">Quoted</string>
+    <string name="status_approved">Approved</string>
+    <string name="status_scheduled">Scheduled</string>
+    <string name="status_in_progress">In Progress</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_invoiced">Invoiced</string>
+    <string name="status_paid">Paid</string>
+    <string name="status_cancelled">Cancelled</string>
+
+    <!-- Today Screen -->
+    <string name="today_title">Today\'s Work</string>
+    <string name="today_empty_title">No visits scheduled today</string>
+    <string name="today_empty_subtitle">Create a new job or schedule a follow-up to see tasks here.</string>
+    <string name="today_metric_due_today">Due Today</string>
+    <string name="today_metric_in_progress">In Progress</string>
+    <string name="today_metric_pending_payment">Pending Collect</string>
+    <string name="today_quick_new_job">New Job</string>
+    <string name="today_quick_new_quote">New Quote</string>
+
+    <!-- Job Detail & Workflow -->
+    <string name="job_title">Job</string>
+    <string name="job_new">New Job</string>
+    <string name="job_number">Job #%s</string>
+    <string name="job_site_address">Site Address</string>
+    <string name="job_scheduled_date">Scheduled Date</string>
+    <string name="job_status">Status</string>
+    <string name="job_timeline">Timeline</string>
+    <string name="job_estimate">Estimate</string>
+    <string name="job_invoice">Invoice</string>
+    <string name="job_evidence">Work Evidence</string>
+    <string name="job_change_orders">Additional Work</string>
+    <string name="job_warranty">Warranty</string>
+    <string name="job_notes">Notes</string>
+    <string name="job_no_jobs_found">No jobs found</string>
+
+    <!-- Customer -->
+    <string name="customer_title">Customers</string>
+    <string name="customer_new">Add Customer</string>
+    <string name="customer_name">Customer Name</string>
+    <string name="customer_phone">Phone Number</string>
+    <string name="customer_alternate_phone">Alternate Phone (Optional)</string>
+    <string name="customer_notes">Customer Notes</string>
+    <string name="customer_search_placeholder">Search by name or mobile number…</string>
+    <string name="customer_no_history">No previous jobs for this customer</string>
+    <string name="customer_total_spent">Total Billed</string>
+    <string name="customer_balance_due">Outstanding Due</string>
+
+    <!-- Estimate / Quote -->
+    <string name="estimate_title">Estimate</string>
+    <string name="estimate_new">Create Estimate</string>
+    <string name="estimate_version">Version %d</string>
+    <string name="estimate_status_draft">Draft</string>
+    <string name="estimate_status_sent">Sent</string>
+    <string name="estimate_status_approved">Approved</string>
+    <string name="estimate_status_rejected">Rejected</string>
+    <string name="estimate_line_items">Line Items</string>
+    <string name="estimate_add_item">Add Item</string>
+    <string name="estimate_subtotal">Subtotal</string>
+    <string name="estimate_discount">Discount</string>
+    <string name="estimate_tax">GST / Tax</string>
+    <string name="estimate_grand_total">Total Estimate</string>
+    <string name="estimate_approve_action">Mark as Approved</string>
+    <string name="estimate_reject_action">Mark as Rejected</string>
+    <string name="estimate_share_pdf">Share Quote PDF</string>
+
+    <!-- Invoice -->
+    <string name="invoice_title">Invoice</string>
+    <string name="invoice_new">Create Invoice</string>
+    <string name="invoice_number">Invoice #%s</string>
+    <string name="invoice_date">Invoice Date</string>
+    <string name="invoice_due_date">Due Date</string>
+    <string name="invoice_total">Invoice Amount</string>
+    <string name="invoice_paid">Amount Received</string>
+    <string name="invoice_balance">Balance Due</string>
+    <string name="invoice_share_pdf">Share Invoice PDF</string>
+
+    <!-- Payment -->
+    <string name="payment_title">Payments</string>
+    <string name="payment_record_action">Record Payment</string>
+    <string name="payment_amount">Amount Received (₹)</string>
+    <string name="payment_mode">Payment Mode</string>
+    <string name="payment_mode_cash">Cash</string>
+    <string name="payment_mode_upi">UPI</string>
+    <string name="payment_mode_bank">Bank Transfer</string>
+    <string name="payment_mode_cheque">Cheque</string>
+    <string name="payment_mode_other">Other</string>
+    <string name="payment_type_advance">Advance</string>
+    <string name="payment_type_partial">Part Payment</string>
+    <string name="payment_type_final">Final Payment</string>
+    <string name="payment_upi_ref">UPI Reference / UTR</string>
+    <string name="payment_date">Payment Date</string>
+    <string name="payment_show_upi_qr">Show UPI QR</string>
+
+    <!-- Money / Profit Screen -->
+    <string name="money_screen_title">Money &amp; Profit</string>
+    <string name="money_total_billed">Total Invoiced</string>
+    <string name="money_total_collected">Cash Collected</string>
+    <string name="money_total_pending">Pending Payments</string>
+    <string name="money_est_profit">Estimated Profit</string>
+    <string name="money_actual_profit">Realized Profit</string>
+    <string name="money_material_cost">Parts &amp; Material Cost</string>
+    <string name="money_profit_explanation">Profit is calculated as Total Received minus Material &amp; Direct Expenses.</string>
+
+    <!-- Work Evidence / Photos -->
+    <string name="evidence_title">Work Photos</string>
+    <string name="evidence_category_before">Before Work</string>
+    <string name="evidence_category_during">During Work</string>
+    <string name="evidence_category_after">Completed Work</string>
+    <string name="evidence_take_photo">Take Photo</string>
+    <string name="evidence_from_gallery">Import from Gallery</string>
+    <string name="evidence_badge_captured">Captured in App</string>
+    <string name="evidence_badge_imported">Imported</string>
+
+    <!-- Settings / Profile -->
+    <string name="settings_title">Settings</string>
+    <string name="profile_title">Business Profile</string>
+    <string name="profile_business_name">Business / Trade Name</string>
+    <string name="profile_owner_name">Your Name</string>
+    <string name="profile_phone">Contact Phone</string>
+    <string name="profile_upi_id">UPI ID (VPA) for QR &amp; Invoices</string>
+    <string name="profile_address">Shop / Business Address</string>
+    <string name="profile_trade_category">Primary Trade</string>
+    <string name="profile_gstin">GSTIN (Optional)</string>
+
+    <!-- Trade Categories -->
+    <string name="trade_electrician">Electrician</string>
+    <string name="trade_ac_hvac">AC &amp; Refrigeration</string>
+    <string name="trade_plumber">Plumber</string>
+    <string name="trade_ro_water">RO &amp; Water Purifier</string>
+    <string name="trade_cctv_security">CCTV &amp; Security</string>
+    <string name="trade_other">General Tradesperson</string>
+
+    <!-- Backup & Security -->
+    <string name="backup_title">Encrypted Backup</string>
+    <string name="backup_create_action">Create Backup Now</string>
+    <string name="backup_restore_action">Restore from Backup File</string>
+    <string name="backup_passphrase">Backup Passphrase (Keep Safe!)</string>
+    <string name="security_biometric_lock">Biometric / App Lock</string>
+
+    <!-- Validation & Errors -->
+    <string name="error_required">This field is required</string>
+    <string name="error_invalid_phone">Please enter a valid 10-digit mobile number</string>
+    <string name="error_invalid_amount">Please enter a valid amount</string>
+    <string name="error_invalid_upi">Please enter a valid UPI ID (e.g. name@okhdfcbank)</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+</resources>

@@ -1,0 +1,9 @@
+# Copy this file to local.properties and fill in real values.
+# NEVER commit local.properties to version control.
+sdk.dir=C\:\\Users\\YourName\\AppData\\Local\\Android\\Sdk
+
+# Signing (only needed for release builds — store securely, not in Git)
+# STORE_FILE=/path/to/release.jks
+# STORE_PASSWORD=
+# KEY_ALIAS=
+# KEY_PASSWORD=

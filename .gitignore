@@ -1,0 +1,28 @@
+# Android generated files
+*.iml
+.gradle/
+local.properties
+.idea/
+.DS_Store
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+
+# Signing keys — NEVER commit real keystores or passwords
+*.jks
+*.keystore
+keystore.properties
+
+# Gradle caches
+.gradle
+
+# Room schema exports — KEEP in version control intentionally
+# app/schemas/ should NOT be gitignored
+
+# Sensitive local config
+local.properties
+# Use local.properties.example as template (see that file)
